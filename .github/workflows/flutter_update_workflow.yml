@@ -1,0 +1,46 @@
+name: Look for Flutter updates
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  push:
+    branches:
+      - master
+
+jobs:
+  update_version:
+    name: check updates
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        channel: [stable, beta, dev]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Fetch release version
+        run: |
+          mkdir -p versions && \
+          curl -sL https://api.github.com/repos/flutter/flutter/branches/${{ matrix.channel }} | \
+          jq -r ".commit.sha" > versions/${{ matrix.channel }}.txt
+      - name: Check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+      - name: Commit latest release version
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add versions
+          git commit -m "New Flutter release: ${{ matrix.channel }}"
+          git push
+      - name: Dispatch Builds
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          curl -XPOST \
+            -u "ThomasKliszowski:${{ secrets.REPO_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Content-Type: application/json" https://api.github.com/repos/${{ github.repository }}/dispatches \
+            --data '{"event_type": "builds", "client_payload": {"channel": "${{ matrix.channel }}"}}'

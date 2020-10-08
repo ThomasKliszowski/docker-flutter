@@ -1,0 +1,43 @@
+name: Publish Docker image
+
+on:
+  repository_dispatch:
+    types: [builds]
+
+jobs:
+  push_to_registry:
+    name: publish (${{ github.event.client_payload.channel }} / ${{ matrix.mode }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [universal, android-fastlane]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: Push to Docker Hub
+        if: ${{ matrix.mode == 'universal' }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: ${{ matrix.mode }}/Dockerfile
+          tags: thomaskliszowski/flutter:${{ github.event.client_payload.channel }}
+          build-args: |
+            flutter_version=${{ github.event.client_payload.channel }}
+      - name: Push to Docker Hub
+        if: ${{ matrix.mode != 'universal' }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: ${{ matrix.mode }}/Dockerfile
+          tags: thomaskliszowski/flutter:${{ matrix.mode }}-${{ github.event.client_payload.channel }}
+          build-args: |
+            flutter_version=${{ github.event.client_payload.channel }}
