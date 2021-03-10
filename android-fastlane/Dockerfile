@@ -38,7 +38,7 @@ RUN sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;${BUILD_TOOLS}" "platform
 # Flutter
 # ----------
 ARG flutter_version="stable"
-ARG glibc_version="2.32-r0"
+ARG glibc_version="2.33-r0"
 
 ENV FLUTTER_HOME "${HOME}/sdks/flutter"
 ENV FLUTTER_VERSION "${flutter_version}"
@@ -64,7 +64,7 @@ RUN flutter config --no-analytics && \
 # ----------
 # Fastlane
 # ----------
-ARG fastlane_version="2.165.0"
+ARG fastlane_version="2.177.0"
 
 ENV FASTLANE_VERSION "${fastlane_version}"
 

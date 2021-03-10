@@ -3,7 +3,7 @@ FROM alpine:latest
 USER root
 
 ARG flutter_version="stable"
-ARG glibc_version="2.32-r0"
+ARG glibc_version="2.33-r0"
 
 ENV FLUTTER_HOME "${HOME}/sdks/flutter"
 ENV FLUTTER_VERSION "${flutter_version}"
