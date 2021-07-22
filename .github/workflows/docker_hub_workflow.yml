@@ -3,10 +3,16 @@ name: Publish Docker image
 on:
   repository_dispatch:
     types: [builds]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Channel'
+        required: true
+        default: 'stable'
 
 jobs:
   push_to_registry:
-    name: publish (${{ github.event.client_payload.channel }} / ${{ matrix.mode }})
+    name: publish (${{ github.event.inputs.channel }} / ${{ matrix.mode }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,15 +35,15 @@ jobs:
         with:
           push: true
           file: ${{ matrix.mode }}/Dockerfile
-          tags: thomaskliszowski/flutter:${{ github.event.client_payload.channel }}
+          tags: thomaskliszowski/flutter:${{ github.event.inputs.channel }}
           build-args: |
-            flutter_version=${{ github.event.client_payload.channel }}
+            flutter_version=${{ github.event.inputs.channel }}
       - name: Push to Docker Hub
         if: ${{ matrix.mode != 'universal' }}
         uses: docker/build-push-action@v2
         with:
           push: true
           file: ${{ matrix.mode }}/Dockerfile
-          tags: thomaskliszowski/flutter:${{ matrix.mode }}-${{ github.event.client_payload.channel }}
+          tags: thomaskliszowski/flutter:${{ matrix.mode }}-${{ github.event.inputs.channel }}
           build-args: |
-            flutter_version=${{ github.event.client_payload.channel }}
+            flutter_version=${{ github.event.inputs.channel }}
