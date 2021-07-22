@@ -14,7 +14,7 @@ ENV ANDROID_HOME "/opt/sdk"
 ENV PATH "${PATH}:${ANDROID_HOME}/cmdline-tools/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/build-tools/${BUILD_TOOLS}"
 
 # Install required dependencies
-RUN apk add --no-cache bash git unzip wget && \
+RUN apk add --no-cache bash git unzip wget xdg-user-dirs && \
   apk add --virtual .rundeps $runDeps && \
   rm -rf /tmp/* && \
   rm -rf /var/cache/apk/*
