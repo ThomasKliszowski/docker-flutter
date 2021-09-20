@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk8:alpine
+FROM adoptopenjdk/openjdk11:alpine
 
 USER root
 
@@ -7,7 +7,7 @@ ENV LD_LIBRARY_PATH "/lib:/usr/lib"
 # ----------
 # Android
 # ----------
-ENV SDK_TOOLS "6858069"
+ENV SDK_TOOLS "7583922"
 ENV BUILD_TOOLS "30.0.2"
 ENV TARGET_SDK "30"
 ENV ANDROID_HOME "/opt/sdk"
